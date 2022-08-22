@@ -9,12 +9,32 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
+      <div>
+        <div>Metamask Data</div>
+        <div>Matamask ready: <span id="metamaskReady">False</span></div>
+      </div>
       <form id="form">
-        <input type="file" />
-        <button type="submit"></button>
+        <input type="file" id="input" />
+        <button type="submit">File upload</button>
       </form>
+
+      <div>Uploaded JSON id: <span id="uploadedId">Null</span></div>
+      <div>Uploaded JSON Uri: <span id="uploadedJsonUri">Null</span></div>
+      <div><button id="sign">Sign With Metamask</button></div>
+      <div>
+        Signature:
+        <span
+          style="max-width: 600px; display: inline-block; word-break: break-word"
+          id="signature"
+          >Null</span
+        >
+      </div>
+      <!-- <div><button id="verify">Verify Sign</button></div>
+      <div>Verification Hash: <sign id="hash">Null</sign></div> -->
     </div>
     <script src="script.js"></script>
     <script src="https://unpkg.com/arweave/bundles/web.bundle.js"></script>
+    <script src="metamask-onboarding.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
   </body>
 </html>
