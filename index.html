@@ -9,6 +9,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
+      `
       <div>
         <div>Metamask Data</div>
         <div>Matamask ready: <span id="metamaskReady">False</span></div>
@@ -17,6 +18,9 @@
         <input type="file" id="input" />
         <button type="submit">File upload</button>
       </form>
+      <div id="uploaded" style="width: 0; height: 0; overflow: hidden">
+        File uploaded: <span id="uploadedData">0%</span>
+      </div>
 
       <div>Uploaded JSON id: <span id="uploadedId">Null</span></div>
       <div>Uploaded JSON Uri: <span id="uploadedJsonUri">Null</span></div>

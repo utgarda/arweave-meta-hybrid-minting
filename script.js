@@ -203,7 +203,7 @@ window.onload = async () => {
     await arweave.transactions.sign(jsonTransaction, key);
 
     // console.log('JSON Transaction', jsonTransaction);
-    await arweave.transactions.post(transaction);
+    await arweave.transactions.post(jsonTransaction);
 
     // console.log('uploadedFileNames', uploadedFileNames);
     const jsonId = jsonTransaction.id;
