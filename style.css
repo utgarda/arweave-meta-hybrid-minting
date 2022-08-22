@@ -9,3 +9,11 @@ body {
   height: 100%;
   width: 100%;
 }
+
+body div {
+  margin-top: 20px;
+}
+
+body form {
+  margin-top: 10px;
+}

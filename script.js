@@ -145,6 +145,9 @@ window.onload = async () => {
   const signature = document.getElementById('signature');
   const verify = document.getElementById('verify');
 
+  const uploaded = document.getElementById('uploaded');
+  const uploadedData = document.getElementById('uploadedData');
+
   signButton.addEventListener('click', async () => {
     if (uploadedID.textContent === 'Null') {
       alert('No json id!');
@@ -175,11 +178,13 @@ window.onload = async () => {
     await arweave.transactions.sign(transaction, key);
 
     const uploader = await arweave.transactions.getUploader(transaction);
+    uploaded.style = 'width: 300px; height: 20px;';
     while (!uploader.isComplete) {
       await uploader.uploadChunk();
       console.log(
         `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`,
       );
+      uploadedData.textContent = `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks} chunks`;
     }
 
     console.log('sent', transaction);
@@ -202,16 +207,21 @@ window.onload = async () => {
 
     await arweave.transactions.sign(jsonTransaction, key);
 
-    // console.log('JSON Transaction', jsonTransaction);
     await arweave.transactions.post(jsonTransaction);
 
-    // console.log('uploadedFileNames', uploadedFileNames);
     const jsonId = jsonTransaction.id;
+
+    const link = document.createElement('a');
     const jsonURI = `https://arweave.net/${jsonId}`;
+    link.href = jsonURI;
+    link.textContent = jsonURI;
+    link.target = '_blank';
 
     console.log('jsonId', jsonId);
 
-    const link = (uploadedID.textContent = jsonId);
-    uploadedUri.textContent = jsonURI;
+    uploadedId.textContent = jsonId;
+
+    uploadedUri.textContent = '';
+    uploadedUri.appendChild(link);
   });
 };
