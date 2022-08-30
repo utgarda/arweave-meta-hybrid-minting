@@ -1,3 +1,11 @@
+import {
+  base64urlStringToBase64,
+  base64strTobase64url,
+  binToHex,
+  getAsByteArray,
+} from './utils.mjs';
+
+import { signPersonal } from './sign.mjs';
 const key = {
   kty: 'RSA',
   n: 'rMLDSm2dj82VgfVmS9XBa7PAvH7Mk7-52z_QN6zvA77qrbjYYKGvSX7RYHal6i7XuQVd7EmKlUpjMBjGkmXuHPqzJBYfh11x-bI5pl6I_yMhPx47jPcIdp3SH_gTnodiYM2GdhniihGpgKdxw-SH5Th-GtJ-vv1e-8kB-C4jox5h0j3XBK9Hw4khw6PRwcIPsgs8OcrzH54VD_iZyYoTlWD7g6vLxhB0cdlvm9sOaANn2IulE6tnWeMCYQ2w5lLQjGd2qAUjBKsJUs1u8HlwhJRtyoa3z1FO6lvC4wdX7ix8OcZemozEUBE4_IbmbrxVznOYqTfhwNa5lGeAR8abaVWzs46LAezxuvYWvTls0cUcytM40fX2n5Uq4xoM4F8SzW3PEu38eVJsuIeb_7qUVrNec0Ie-FVmx_FAJV2Fq_0FNXtJMd7TmrawjdflRWX8KFe-71adh9jtEb7tjyeYfUiYGXtlZrpuEjSfVQU6DKwAGW0v0SGSaTq425HEk0kp1_QIddcbvI2vYZuk3ImgD3PMbrYaX_4OFBc4QrFMsmBJk_A0g57ooDIkmZt1Ca8NJG4fqHK6rGBY8KVgbOwW5tCeoYOiCVQPJsHBqRIFRm8zJLeBE0TZRIJNUYUE6QaYFQH8hCv-IWWqJScnU7iiBlllyO0jZSuDU6o5aIdQHps',
@@ -10,29 +18,9 @@ const key = {
   qi: 'bTscTyLPh6UcycW26s4dlQ5SWbjOrFreq2_oIQ-vHUFNs-Kbo_mj1C_QJcfdHMw_01RG_2ZD_p3JulRflqvy2nOQdDipzdwmZ2DfG9ZiETYMhDJZsSuPjY13-_TFtWIe-6LIwXKRj_3ZyH-Uu1PR6cepiGF6LnlyxpungNd78v80Sa3GMca7SD3K8Am2nKutn2h-gk_gayb6GgaiSiDSYP5Y0MLFKY4bQxL7dRXJy_xmRQ2_mfBhciQORAtNAxztT2OYZ_VNVKryF8nVBJfWYeqYy7YLqvdaxN52xqgfKOOEPTAuP7OT1U9tZHMpr_-0KF_aTHWOZeEyfRELSdVE8A',
 };
 
-const sendTransaction = async (data, key, type) => {
-  return transaction;
-};
-
 const uploadedFileNames = [];
-
-function readFile(file) {
-  return new Promise((resolve, reject) => {
-    // Create file reader
-    let reader = new FileReader();
-
-    // Register event listeners
-    reader.addEventListener('loadend', (e) => resolve(e.target.result));
-    reader.addEventListener('error', reject);
-
-    // Read file
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function getAsByteArray(file) {
-  return new Uint8Array(await readFile(file));
-}
+const filesMetaData = [];
+const currentFileMetaData = {};
 
 async function getNetworkAndChainId() {
   try {
@@ -54,72 +42,6 @@ async function getNetworkAndChainId() {
   }
 }
 
-const signTypedDataV4 = async (networkId, chainId, newAccounts, messageInputValue) => {
-  if (networkId && chainId && newAccounts) {
-    const networkId1 = parseInt(networkId, 10);
-    const chainId1 = parseInt(chainId, 16) || networkId1;
-    const msgParams = {
-      domain: {
-        chainId: chainId1.toString(),
-        name: 'Ether Mail',
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-        version: '1',
-      },
-      message: {
-        contents: messageInputValue,
-        from: {
-          name: 'nobody1',
-          wallets: newAccounts,
-        },
-        to: [
-          {
-            name: 'nobody2',
-            wallets: [
-              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-              '0xB0B0b0b0b0b0B000000000000000000000000000',
-            ],
-          },
-        ],
-      },
-      primaryType: 'Mail',
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' },
-        ],
-        Group: [
-          { name: 'name', type: 'string' },
-          { name: 'members', type: 'Person[]' },
-        ],
-        Mail: [
-          { name: 'from', type: 'Person' },
-          { name: 'to', type: 'Person[]' },
-          { name: 'contents', type: 'string' },
-        ],
-        Person: [
-          { name: 'name', type: 'string' },
-          { name: 'wallets', type: 'address[]' },
-        ],
-      },
-    };
-
-    try {
-      const from = newAccounts[0];
-      const sign = await ethereum.request({
-        method: 'eth_signTypedData_v4',
-        params: [from, JSON.stringify(msgParams)],
-      });
-      console.log(sign);
-      return sign;
-    } catch (err) {
-      console.error(err);
-    }
-  }
-};
-
 window.onload = async () => {
   const ready = document.getElementById('metamaskReady');
 
@@ -137,29 +59,68 @@ window.onload = async () => {
 
   const form = document.getElementById('form');
 
-  const input = document.getElementById('input');
   const signButton = document.getElementById('sign');
-  const verifyButton = document.getElementById('verify');
+
   const uploadedID = document.getElementById('uploadedId');
   const uploadedUri = document.getElementById('uploadedJsonUri');
   const signature = document.getElementById('signature');
-  const verify = document.getElementById('verify');
+  const dataList = document.getElementById('datalist');
+  const bulkmintButton = document.getElementById('bulkmintButton');
 
   const uploaded = document.getElementById('uploaded');
   const uploadedData = document.getElementById('uploadedData');
+
+  // uploadedID.textContent = 'i0-oWbzktkHgcmLKiFz1NuXO0x1IKA4BBUnOFRb_7cg=';
+
+  const decoded = atob(base64urlStringToBase64(uploadedID.textContent));
+  const encoded = btoa(decoded);
+
+  console.log(
+    'decoded encoded',
+    uploadedID.textContent,
+    decoded,
+    encoded,
+    base64strTobase64url(encoded),
+    uploadedID.textContent === base64strTobase64url(encoded),
+  );
+
+  const hex = binToHex(decoded);
+  console.log('hex', hex);
+
+  bulkmintButton.addEventListener('click', async () => {
+    console.log('bulk mint clicked');
+    console.log(filesMetaData);
+  });
 
   signButton.addEventListener('click', async () => {
     if (uploadedID.textContent === 'Null') {
       alert('No json id!');
       return;
     }
-    const sign = await signTypedDataV4(
-      networkId,
-      chainId,
-      newAccounts,
-      uploadedID.textContent,
-    );
+
+    const data = uploadedID.textContent;
+    console.log('data', data);
+    const decoded = atob(base64urlStringToBase64(uploadedID.textContent));
+    console.log('decoded', decoded);
+    const hex = binToHex(decoded);
+    console.log('hex', hex);
+
+    const sign = await signPersonal(newAccounts, hex);
+    // console.log('sign', sign);
     signature.textContent = sign;
+    currentFileMetaData.sign = sign;
+    currentFileMetaData.hex = `0x${hex}`;
+
+    // console.log('filesMetaData', filesMetaData);
+    console.log('currentFileMetaData', currentFileMetaData);
+    console.log(filesMetaData);
+    filesMetaData.push({...currentFileMetaData});
+    console.log(filesMetaData);
+
+    dataList.innerHTML = null;
+    filesMetaData.forEach((data) => {
+      dataList.appendChild(createDataListElement(data));
+    });
   });
 
   form.addEventListener('submit', async (event) => {
@@ -179,13 +140,13 @@ window.onload = async () => {
 
     const uploader = await arweave.transactions.getUploader(transaction);
     uploaded.style = 'width: 300px; height: 20px;';
-    while (!uploader.isComplete) {
-      await uploader.uploadChunk();
-      console.log(
-        `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`,
-      );
-      uploadedData.textContent = `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks} chunks`;
-    }
+    // while (!uploader.isComplete) {
+    //   await uploader.uploadChunk();
+    //   console.log(
+    //     `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`,
+    //   );
+    //   uploadedData.textContent = `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks} chunks`;
+    // }
 
     console.log('sent', transaction);
 
@@ -196,18 +157,19 @@ window.onload = async () => {
       description:
         'Hybrid minting demo with image and JSON meeta stored in Arweave, file IDs signed with Sign Typed Data v4',
       imageURI: `https://arweave.net/${imageId}`,
+      fileName: file.name,
     };
 
     const imageMetaDataJSON = JSON.stringify(imageMetaData);
 
-    console.log(imageMetaData);
+    console.log('imageMetaData', imageMetaData);
 
     const jsonTransaction = await arweave.createTransaction({ data: imageMetaDataJSON }, key);
     transaction.addTag('Content-Type', 'application/json');
 
     await arweave.transactions.sign(jsonTransaction, key);
 
-    await arweave.transactions.post(jsonTransaction);
+    // await arweave.transactions.post(jsonTransaction);
 
     const jsonId = jsonTransaction.id;
 
@@ -223,5 +185,40 @@ window.onload = async () => {
 
     uploadedUri.textContent = '';
     uploadedUri.appendChild(link);
+    // filesMetaData.push(imageMetaData);
+    currentFileMetaData.name = `HybridMint${uploadedFileNames.length}`;
+    currentFileMetaData.description =
+      'Hybrid minting demo with image and JSON meeta stored in Arweave, file IDs signed with Sign Typed Data v4';
+    currentFileMetaData.imageURI = `https://arweave.net/${imageId}`;
+    currentFileMetaData.fileName = file.name;
+
+    // dataList.innerHTML = null;
+    // filesMetaData.forEach((data) => {
+    //   dataList.appendChild(createDataListElement(data));
+    // });
   });
+};
+
+const createDataListElement = (imageMetaData) => {
+  const div1 = document.createElement('div');
+  const nameDiv = document.createElement('div');
+  const fileNameDiv = document.createElement('div');
+  const descriptionDiv = document.createElement('div');
+  const imageUriDiv = document.createElement('div');
+  const hex = document.createElement('div');
+  const sign = document.createElement('div');
+  nameDiv.textContent = `name: ${imageMetaData.name}`;
+  fileNameDiv.textContent = `filename: ${imageMetaData.fileName}`;
+  descriptionDiv.textContent = `description: ${imageMetaData.description}`;
+  imageUriDiv.textContent = `imageRUI: ${imageMetaData.imageURI}`;
+  hex.textContent = `hex: ${imageMetaData.hex}`;
+  sign.textContent = `sign: ${imageMetaData.sign}`;
+
+  div1.appendChild(nameDiv);
+  div1.appendChild(fileNameDiv);
+  div1.appendChild(descriptionDiv);
+  div1.appendChild(imageUriDiv);
+  div1.appendChild(hex);
+  div1.appendChild(sign);
+  return div1;
 };
