@@ -181,7 +181,7 @@ window.onload = async () => {
     const imageMetaData = {
       name: `HybridMint${uploadedFileNames.length}`,
       description:
-        'Hybrid minting demo with image and JSON meeta stored in Arweave, file IDs signed with Sign Typed Data v4',
+        'Hybrid minting demo with image and JSON meta stored in Arweave, file IDs signed with Personal Sign',
       imageURI: `https://arweave.net/${imageId}`,
       fileName: file.name,
     };
