@@ -166,13 +166,13 @@ window.onload = async () => {
 
     const uploader = await arweave.transactions.getUploader(transaction);
     uploaded.style = 'width: 300px; height: 20px;';
-    // while (!uploader.isComplete) {
-    //   await uploader.uploadChunk();
-    //   console.log(
-    //     `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`,
-    //   );
-    //   uploadedData.textContent = `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks} chunks`;
-    // }
+    while (!uploader.isComplete) {
+      await uploader.uploadChunk();
+      console.log(
+        `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`,
+      );
+      uploadedData.textContent = `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks} chunks`;
+    }
 
     console.log('sent', transaction);
 
@@ -195,7 +195,7 @@ window.onload = async () => {
 
     await arweave.transactions.sign(jsonTransaction, key);
 
-    // await arweave.transactions.post(jsonTransaction);
+    await arweave.transactions.post(jsonTransaction);
 
     const jsonId = jsonTransaction.id;
 
@@ -234,17 +234,17 @@ const createDataListElement = (imageMetaData) => {
   const imageUriDiv = document.createElement('div');
   const hex = document.createElement('div');
   const sign = document.createElement('div');
-  nameDiv.innerHTML = `<div class="title-col">name:</div> <div>${imageMetaData.name}</div>`;
+  nameDiv.innerHTML = `<div class="title-col">Name:</div> <div>${imageMetaData.name}</div>`;
   nameDiv.classList.add('metarow');
-  fileNameDiv.innerHTML = `<div class="title-col">filename:</div> <div>${imageMetaData.fileName}</div>`;
+  fileNameDiv.innerHTML = `<div class="title-col">Filename:</div> <div>${imageMetaData.fileName}</div>`;
   fileNameDiv.classList.add('metarow');
-  descriptionDiv.innerHTML = `<div class="title-col">description:</div> <div>${imageMetaData.description}</div>`;
+  descriptionDiv.innerHTML = `<div class="title-col">Description:</div> <div>${imageMetaData.description}</div>`;
   descriptionDiv.classList.add('metarow');
-  imageUriDiv.innerHTML = `<div class="title-col">imageRUI:</div> <div><a> href="${imageMetaData.imageURI}">${imageMetaData.imageURI}</a></div>`;
+  imageUriDiv.innerHTML = `<div class="title-col">ImageURI:</div> <div><a href="${imageMetaData.imageURI}" target="_blank">${imageMetaData.imageURI}</a></div>`;
   imageUriDiv.classList.add('metarow');
-  hex.innerHTML = `<div class="title-col">hex:</div> <div>${imageMetaData.hex}</div>`;
+  hex.innerHTML = `<div class="title-col">ArweaveIDs in hex:</div> <div>${imageMetaData.hex}</div>`;
   hex.classList.add('metarow');
-  sign.innerHTML = `<div class="title-col">sign:</div> <div class="sign">${imageMetaData.sign}</div>`;
+  sign.innerHTML = `<div class="title-col">Signature:</div> <div class="sign">${imageMetaData.sign}</div>`;
   sign.classList.add('metarow');
 
   div1.appendChild(nameDiv);
