@@ -132,10 +132,10 @@ window.onload = async () => {
     console.log('xxx', xxx);
 
     hexsDiv.textContent = `[${hexs.reduce((acc, val) => {
-      return acc.length === 0 ? `0x${val}` : acc + ', ' + `0x${val}`;
+      return acc.length === 0 ? `0x${val}` : acc + ',' + `0x${val}`;
     }, '')}]`;
     signsDiv.textContent = `[${signs.reduce((acc, val) => {
-      return acc.length === 0 ? val : acc + ', ' + val;
+      return acc.length === 0 ? val : acc + ',' + val;
     }, '')}]`;
     // console.log('filesMetaData', filesMetaData);
     // console.log('currentFileMetaData', currentFileMetaData);
