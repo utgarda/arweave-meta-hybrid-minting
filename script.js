@@ -21,6 +21,8 @@ const key = {
 const uploadedFileNames = [];
 const filesMetaData = [];
 const currentFileMetaData = {};
+const signs = [];
+const hexs = [];
 
 async function getNetworkAndChainId() {
   try {
@@ -60,12 +62,15 @@ window.onload = async () => {
   const form = document.getElementById('form');
 
   const signButton = document.getElementById('sign');
+  const input = document.getElementById('input');
 
   const uploadedID = document.getElementById('uploadedId');
   const uploadedUri = document.getElementById('uploadedJsonUri');
   const signature = document.getElementById('signature');
   const dataList = document.getElementById('datalist');
   const bulkmintButton = document.getElementById('bulkmintButton');
+  const signsDiv = document.getElementById('signs');
+  const hexsDiv = document.getElementById('hexs');
 
   const uploaded = document.getElementById('uploaded');
   const uploadedData = document.getElementById('uploadedData');
@@ -89,7 +94,15 @@ window.onload = async () => {
 
   bulkmintButton.addEventListener('click', async () => {
     console.log('bulk mint clicked');
+    console.log(signs);
+    console.log(hexs);
     console.log(filesMetaData);
+  });
+
+  input.addEventListener('change', () => {
+    signature.textContent = 'Null';
+    uploadedUri.textContent = 'Null';
+    uploadedID.textContent = 'Null';
   });
 
   signButton.addEventListener('click', async () => {
@@ -110,12 +123,25 @@ window.onload = async () => {
     signature.textContent = sign;
     currentFileMetaData.sign = sign;
     currentFileMetaData.hex = `0x${hex}`;
+    signs.push(sign);
+    hexs.push(hex);
 
+    const xxx = hexs.reduce((acc, val) => {
+      return acc.length === 0 ? `0x${val}` : acc + ', ' + `0x${val}`;
+    }, '');
+    console.log('xxx', xxx);
+
+    hexsDiv.textContent = `[${hexs.reduce((acc, val) => {
+      return acc.length === 0 ? `0x${val}` : acc + ', ' + `0x${val}`;
+    }, '')}]`;
+    signsDiv.textContent = `[${signs.reduce((acc, val) => {
+      return acc.length === 0 ? val : acc + ', ' + val;
+    }, '')}]`;
     // console.log('filesMetaData', filesMetaData);
-    console.log('currentFileMetaData', currentFileMetaData);
-    console.log(filesMetaData);
-    filesMetaData.push({...currentFileMetaData});
-    console.log(filesMetaData);
+    // console.log('currentFileMetaData', currentFileMetaData);
+    // console.log(filesMetaData);
+    filesMetaData.push({ ...currentFileMetaData });
+    // console.log(filesMetaData);
 
     dataList.innerHTML = null;
     filesMetaData.forEach((data) => {
@@ -185,7 +211,7 @@ window.onload = async () => {
 
     uploadedUri.textContent = '';
     uploadedUri.appendChild(link);
-    // filesMetaData.push(imageMetaData);
+
     currentFileMetaData.name = `HybridMint${uploadedFileNames.length}`;
     currentFileMetaData.description =
       'Hybrid minting demo with image and JSON meeta stored in Arweave, file IDs signed with Sign Typed Data v4';
@@ -201,18 +227,25 @@ window.onload = async () => {
 
 const createDataListElement = (imageMetaData) => {
   const div1 = document.createElement('div');
+  div1.classList.add('metacontainer');
   const nameDiv = document.createElement('div');
   const fileNameDiv = document.createElement('div');
   const descriptionDiv = document.createElement('div');
   const imageUriDiv = document.createElement('div');
   const hex = document.createElement('div');
   const sign = document.createElement('div');
-  nameDiv.textContent = `name: ${imageMetaData.name}`;
-  fileNameDiv.textContent = `filename: ${imageMetaData.fileName}`;
-  descriptionDiv.textContent = `description: ${imageMetaData.description}`;
-  imageUriDiv.textContent = `imageRUI: ${imageMetaData.imageURI}`;
-  hex.textContent = `hex: ${imageMetaData.hex}`;
-  sign.textContent = `sign: ${imageMetaData.sign}`;
+  nameDiv.innerHTML = `<div class="title-col">name:</div> <div>${imageMetaData.name}</div>`;
+  nameDiv.classList.add('metarow');
+  fileNameDiv.innerHTML = `<div class="title-col">filename:</div> <div>${imageMetaData.fileName}</div>`;
+  fileNameDiv.classList.add('metarow');
+  descriptionDiv.innerHTML = `<div class="title-col">description:</div> <div>${imageMetaData.description}</div>`;
+  descriptionDiv.classList.add('metarow');
+  imageUriDiv.innerHTML = `<div class="title-col">imageRUI:</div> <div><a> href="${imageMetaData.imageURI}">${imageMetaData.imageURI}</a></div>`;
+  imageUriDiv.classList.add('metarow');
+  hex.innerHTML = `<div class="title-col">hex:</div> <div>${imageMetaData.hex}</div>`;
+  hex.classList.add('metarow');
+  sign.innerHTML = `<div class="title-col">sign:</div> <div class="sign">${imageMetaData.sign}</div>`;
+  sign.classList.add('metarow');
 
   div1.appendChild(nameDiv);
   div1.appendChild(fileNameDiv);

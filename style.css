@@ -2,7 +2,7 @@ html {
   height: 100%;
 }
 body {
-  background-color: aqua;
+  /* background-color: aqua; */
   /* display: flex; */
   /* justify-content: center; */
   /* align-items: center; */
@@ -11,7 +11,7 @@ body {
 }
 
 body div {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 body form {
@@ -23,5 +23,22 @@ body form {
 }
 
 .datalist {
+}
+
+.metacontainer div {
   background-color: aquamarine;
+  margin: 0;
+  padding: 0;
+}
+
+.metacontainer .metarow div {
+  display: inline-block;
+}
+
+.metacontainer .title-col {
+  width: 100px;
+}
+.sign {
+  word-break: break-word;
+  max-width: 600px;
 }
