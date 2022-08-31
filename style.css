@@ -2,10 +2,6 @@ html {
   height: 100%;
 }
 body {
-  /* background-color: aqua; */
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
   height: 100%;
   width: 100%;
 }
@@ -20,9 +16,6 @@ body form {
 
 #root {
   background-color: blanchedalmond;
-}
-
-.datalist {
 }
 
 .metacontainer div {

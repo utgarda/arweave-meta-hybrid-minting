@@ -1,30 +1,19 @@
-export const base64urlStringToBase64 = (str) => str.split('-').join('+').split('_').join('/');
+export const getNetworkAndChainId = async () => {
+  try {
+    const chainId = await ethereum.request({
+      method: 'eth_chainId',
+    });
 
-export const base64strTobase64url = (str) => str.split('+').join('-').split('/').join('_');
+    const networkId = await ethereum.request({
+      method: 'net_version',
+    });
 
-export const binToHex = (bin) => {
-  for (var i = 0, hex = []; i < bin.length; ++i) {
-    let tmp = bin.charCodeAt(i).toString(16);
-    if (tmp.length === 1) tmp = '0' + tmp;
-    hex[hex.length] = tmp;
+    const newAccounts = await ethereum.request({
+      method: 'eth_accounts',
+    });
+
+    return { chainId, networkId, newAccounts };
+  } catch (err) {
+    console.error(err);
   }
-  return hex.join('');
 };
-
-export function readFile(file) {
-  return new Promise((resolve, reject) => {
-    // Create file reader
-    let reader = new FileReader();
-
-    // Register event listeners
-    reader.addEventListener('loadend', (e) => resolve(e.target.result));
-    reader.addEventListener('error', reject);
-
-    // Read file
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-export async function getAsByteArray(file) {
-  return new Uint8Array(await readFile(file));
-}
