@@ -2,7 +2,7 @@ import { base64urlStringToBase64, binToHex, getAsByteArray } from './helpers.mjs
 import { signPersonal } from './sign.mjs';
 import { key } from './key.mjs';
 import { contract1 } from './contract.mjs';
-import { getNetworkAndChainId } from './utils.mjs';
+import { getNetworkAndChainId, sendArweaveTransaction } from './utils.mjs';
 
 const web3 = new Web3(Web3.givenProvider);
 
@@ -32,6 +32,7 @@ window.onload = async () => {
   const form = document.getElementById('form');
   const signButton = document.getElementById('sign');
   const input = document.getElementById('input');
+  const uploadedImageId = document.getElementById('uploadedImageId');
   const uploadedID = document.getElementById('uploadedId');
   const uploadedUri = document.getElementById('uploadedJsonUri');
   const signature = document.getElementById('signature');
@@ -117,57 +118,47 @@ window.onload = async () => {
     uploadedFileNames.push(file.name);
 
     const data = await getAsByteArray(file);
-    // console.log(data);
 
-    const transaction = await arweave.createTransaction({ data }, key);
-    transaction.addTag('Content-Type', fileType);
-
-    await arweave.transactions.sign(transaction, key);
-
-    const uploader = await arweave.transactions.getUploader(transaction);
-    uploaded.style = 'width: 300px; height: 20px;';
-    while (!uploader.isComplete) {
-      await uploader.uploadChunk();
-      console.log(
-        `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`,
-      );
-      uploadedData.textContent = `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks} chunks`;
-    }
-
-    const imageId = transaction.id;
+    const imageId = await sendArweaveTransaction(arweave, data, key, fileType, uploadedData);
 
     const imageMetaData = {
       name: `HybridMint${uploadedFileNames.length}`,
       description:
         'Hybrid minting demo with image and JSON meta stored in Arweave, file IDs signed with Personal Sign',
-      imageURI: `https://arweave.net/${imageId}`,
-      fileName: file.name,
+      image: `ar://${imageId}`,
     };
 
     const imageMetaDataJSON = JSON.stringify(imageMetaData);
 
-    // console.log('imageMetaData', imageMetaData);
+    const jsonId = await sendArweaveTransaction(
+      arweave,
+      imageMetaDataJSON,
+      key,
+      'application/json',
+      uploadedData,
+    );
 
-    const jsonTransaction = await arweave.createTransaction({ data: imageMetaDataJSON }, key);
-    transaction.addTag('Content-Type', 'application/json');
-    await arweave.transactions.sign(jsonTransaction, key);
-    await arweave.transactions.post(jsonTransaction);
-    const jsonId = jsonTransaction.id;
-
-    const link = document.createElement('a');
+    const jsonLink = document.createElement('a');
     const jsonURI = `https://arweave.net/${jsonId}`;
-    link.href = jsonURI;
-    link.textContent = jsonURI;
-    link.target = '_blank';
+    jsonLink.href = jsonURI;
+    jsonLink.textContent = jsonURI;
+    jsonLink.target = '_blank';
 
+    const imageURI = `https://arweave.net/${imageId}`;
+    const imageLink = document.createElement('a');
+    imageLink.href = imageURI;
+    imageLink.textContent = imageURI;
+    imageLink.target = '_blank';
+
+    uploadedImageId.textContent = '';
+    uploadedImageId.appendChild(imageLink);
     uploadedId.textContent = jsonId;
     uploadedUri.textContent = '';
-    uploadedUri.appendChild(link);
-
-    currentFileMetaData.name = `HybridMint${uploadedFileNames.length}`;
-    currentFileMetaData.description =
-      'Hybrid minting demo with image and JSON meta stored in Arweave, file IDs signed with Personal Sign';
-    currentFileMetaData.imageURI = `https://arweave.net/${imageId}`;
+    uploadedUri.appendChild(jsonLink);
+    currentFileMetaData.name = imageMetaData.name;
+    currentFileMetaData.description = imageMetaData.description;
+    currentFileMetaData.imageURI = imageURI;
+    currentFileMetaData.jsonURI = jsonURI;
     currentFileMetaData.fileName = file.name;
   });
 };
@@ -179,6 +170,7 @@ const createDataListElement = (imageMetaData) => {
   const fileNameDiv = document.createElement('div');
   const descriptionDiv = document.createElement('div');
   const imageUriDiv = document.createElement('div');
+  const jsonUriDiv = document.createElement('div');
   const hex = document.createElement('div');
   const sign = document.createElement('div');
   nameDiv.innerHTML = `<div class="title-col">Name:</div> <div>${imageMetaData.name}</div>`;
@@ -189,6 +181,8 @@ const createDataListElement = (imageMetaData) => {
   descriptionDiv.classList.add('metarow');
   imageUriDiv.innerHTML = `<div class="title-col">ImageURI:</div> <div><a href="${imageMetaData.imageURI}" target="_blank">${imageMetaData.imageURI}</a></div>`;
   imageUriDiv.classList.add('metarow');
+  jsonUriDiv.innerHTML = `<div class="title-col">JSONURI:</div> <div><a href="${imageMetaData.jsonURI}" target="_blank">${imageMetaData.jsonURI}</a></div>`;
+  jsonUriDiv.classList.add('metarow');
   hex.innerHTML = `<div class="title-col">ArweaveIDs in hex:</div> <div>${imageMetaData.hex}</div>`;
   hex.classList.add('metarow');
   sign.innerHTML = `<div class="title-col">Signature:</div> <div class="sign">${imageMetaData.sign}</div>`;
@@ -198,6 +192,7 @@ const createDataListElement = (imageMetaData) => {
   div1.appendChild(fileNameDiv);
   div1.appendChild(descriptionDiv);
   div1.appendChild(imageUriDiv);
+  div1.appendChild(jsonUriDiv);
   div1.appendChild(hex);
   div1.appendChild(sign);
   return div1;
