@@ -2,14 +2,31 @@ export const contract1 = {
   abi: {
     inputs: [
       {
-        internalType: 'bytes32[]',
-        name: 'metadata',
-        type: 'bytes32[]',
+        internalType: 'bytes32',
+        name: 'directory',
+        type: 'bytes32',
       },
       {
-        internalType: 'bytes[]',
-        name: 'signatures',
-        type: 'bytes[]',
+        components: [
+          {
+            internalType: 'address',
+            name: 'to',
+            type: 'address',
+          },
+          {
+            internalType: 'bytes32[]',
+            name: 'metadata',
+            type: 'bytes32[]',
+          },
+          {
+            internalType: 'bytes[]',
+            name: 'signatures',
+            type: 'bytes[]',
+          },
+        ],
+        internalType: 'struct IMultiaddressHybridBulkMinter.SingleAddressBulkMint[]',
+        name: 'data',
+        type: 'tuple[]',
       },
     ],
     name: 'bulkMint',
@@ -17,5 +34,5 @@ export const contract1 = {
     stateMutability: 'nonpayable',
     type: 'function',
   },
-  address: '0x62cd24A3666312B8A06dE274C136775c6B6Ed84D',
+  address: '0xe5aDefE963f8776Fbfbdd0d5acFcdFC04781Eb3C',
 };

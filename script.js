@@ -87,6 +87,13 @@ window.onload = async () => {
     a.target = '_blank';
     manifestLink.appendChild(a);
 
+    const decoded = atob(base64urlStringToBase64(manifestTransaction));
+    // console.log('decoded', decoded);
+    const manifestTransactionHex = binToHex(decoded);
+
+    const manifestHex = document.createElement('div');
+    manifestHex.innerHTML = `<h4>Manifest Id in HEX: <span id="manifestHexData">${manifestTransactionHex}</span></h4>`;
+    manifestData.appendChild(manifestHex);
     paths.forEach((path) =>
       manifestData.appendChild(
         createManifestRow(path[0], `https://arweave.net/${path[1].id}`),
@@ -98,13 +105,41 @@ window.onload = async () => {
     console.log('bulk mint clicked');
     console.log('signs', signs);
     console.log('hexs', hexs);
-    console.log('accc', newAccounts[0]);
+    // console.log('accc', newAccounts[0]);
+
+    const manifestHexData = document.getElementById('manifestHexData');
+
+    if (!manifestHexData) {
+      alert('no maniest hex!');
+      return;
+    }
+
+    const directory = `0x${manifestHexData.textContent}`;
+
+    console.log(directory);
+    console.log(accounts);
+
+    const data = accounts.reduce((acc, { account, hex, sign }) => {
+      const current = acc.find((el) => el[0] === account);
+      // console.log('current', current);
+      if (!current) {
+        acc.push([account, [`0x${hex}`], [sign]]);
+        return acc;
+      }
+
+      current[1].push(`0x${hex}`);
+      current[2].push(sign);
+      return acc;
+    }, []);
+
+    console.log('data', JSON.stringify(data, null, ' '));
 
     const bulk = contract.methods.bulkMint;
 
-    const meta = hexs.map((hex) => `0x${hex}`);
+    // const meta = hexs.map((hex) => `0x${hex}`);
+    const { newAccounts } = await getNetworkAndChainId();
 
-    const res = await bulk(meta, signs).send({
+    const res = await bulk(directory, data).send({
       from: newAccounts[0],
     });
 
@@ -133,7 +168,7 @@ window.onload = async () => {
     // console.log('hex', hex);
 
     // console.log('newAccount', newAccounts);
-    const { chainId, newAccounts, networkId } = await getNetworkAndChainId();
+    const { newAccounts } = await getNetworkAndChainId();
 
     const sign = await signPersonal(newAccounts, hex);
 
