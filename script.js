@@ -39,6 +39,7 @@ window.onload = async () => {
   const currentAccount = document.getElementById('currentAccount');
   const sigNatureList = document.getElementById('signatures');
   const sendManifestButton = document.getElementById('sendManifestButton');
+  const manifestData = document.getElementById('manifest-data');
   console.log(sigNatureList);
 
   if (!window.ethereum) {
@@ -62,7 +63,35 @@ window.onload = async () => {
   sendManifestButton.addEventListener('click', async () => {
     console.log('sendManifestButton');
     const manifest = createArweaveManest(filesMetaData);
-    console.log('manifest', JSON.stringify(manifest));
+    console.log('manifest', JSON.stringify(manifest, null, ' '));
+
+    manifestData.innerHTML = null;
+
+    const paths = Object.entries(manifest.paths);
+    console.log(paths);
+
+    const manifestTransaction = await sendArweaveTransaction(
+      arweave,
+      JSON.stringify(manifest, null, ' '),
+      key,
+      'application/json',
+      uploadedData,
+    );
+
+    console.log('manifestTransaction id', manifestTransaction);
+
+    const manifestLink = document.getElementById('manifest-link');
+    const a = document.createElement('a');
+    a.textContent = `https://arweave.net/${manifestTransaction}`;
+    a.href = `https://arweave.net/${manifestTransaction}`;
+    a.target = '_blank';
+    manifestLink.appendChild(a);
+
+    paths.forEach((path) =>
+      manifestData.appendChild(
+        createManifestRow(path[0], `https://arweave.net/${path[1].id}`),
+      ),
+    );
   });
 
   bulkmintButton.addEventListener('click', async () => {
@@ -256,5 +285,25 @@ const createSignaturesRow = (account, hex, signature) => {
   container.appendChild(accountDiv);
   container.appendChild(hexDiv);
   container.appendChild(signatureDiv);
+  return container;
+};
+
+const createManifestRow = (fileName, jsonLink) => {
+  const container = document.createElement('div');
+  container.classList.add('manifest-row');
+
+  const file = document.createElement('div');
+  file.classList.add('filename');
+  file.textContent = fileName;
+  const link = document.createElement('div');
+  link.classList.add('link');
+  const a = document.createElement('a');
+  a.textContent = jsonLink;
+  a.href = jsonLink;
+  link.appendChild(a);
+
+  container.appendChild(file);
+  container.appendChild(link);
+
   return container;
 };
