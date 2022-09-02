@@ -16,19 +16,6 @@ const hexs = [];
 
 window.onload = async () => {
   const ready = document.getElementById('metamaskReady');
-
-  if (!window.ethereum) {
-    console.log('MetaMask is not installed!');
-    ready.textContent = 'False';
-    return;
-  }
-
-  const { chainId, newAccounts, networkId } = await getNetworkAndChainId();
-  ready.textContent = `True Chain: ${chainId} Network: ${networkId} Acc: ${newAccounts}`;
-
-  const arweave = Arweave.init({});
-  arweave.network.getInfo().then((data) => console.log('arweave connect status: ', data));
-
   const form = document.getElementById('form');
   const signButton = document.getElementById('sign');
   const input = document.getElementById('input');
@@ -43,6 +30,25 @@ window.onload = async () => {
   const uploaded = document.getElementById('uploaded');
   const uploadedData = document.getElementById('uploadedData');
   const gas = document.getElementById('gas');
+  const currentAccount = document.getElementById('currentAccount');
+
+  if (!window.ethereum) {
+    console.log('MetaMask is not installed!');
+    ready.textContent = 'False';
+    return;
+  }
+
+  const { chainId, newAccounts, networkId } = await getNetworkAndChainId();
+  ready.textContent = `Chain: ${chainId} Network: ${networkId}`;
+  currentAccount.textContent = `${newAccounts}`;
+
+  ethereum.on('accountsChanged', (accounts) => {
+    console.log('account change', accounts);
+    currentAccount.textContent = `${accounts}`;
+  });
+
+  const arweave = Arweave.init({});
+  arweave.network.getInfo().then((data) => console.log('arweave connect status: ', data));
 
   bulkmintButton.addEventListener('click', async () => {
     console.log('bulk mint clicked');
@@ -75,7 +81,7 @@ window.onload = async () => {
       return;
     }
 
-    const data = uploadedID.textContent;
+    // const data = uploadedID.textContent;
     // console.log('data', data);
     const decoded = atob(base64urlStringToBase64(uploadedID.textContent));
     // console.log('decoded', decoded);
@@ -90,9 +96,9 @@ window.onload = async () => {
     signs.push(sign);
     hexs.push(hex);
 
-    const xxx = hexs.reduce((acc, val) => {
-      return acc.length === 0 ? `0x${val}` : acc + ', ' + `0x${val}`;
-    }, '');
+    // const xxx = hexs.reduce((acc, val) => {
+    //   return acc.length === 0 ? `0x${val}` : acc + ', ' + `0x${val}`;
+    // }, '');
     // console.log('xxx', xxx);
 
     hexsDiv.textContent = `[${hexs.reduce((acc, val) => {
