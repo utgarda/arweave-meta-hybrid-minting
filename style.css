@@ -13,7 +13,8 @@ body div {
   margin-bottom: 5px;
 }
 
-h2 {
+h2,
+h4 {
   margin: 0;
   padding: 0;
 }
@@ -27,7 +28,7 @@ body form {
 }
 
 .metacontainer div {
-  background-color: aquamarine;
+  background-color: rgb(201, 252, 235);
   margin: 0;
   padding: 0;
 }
@@ -37,5 +38,38 @@ body form {
 }
 
 .metacontainer .title-col {
-  width: 150px;
+  width: 200px;
+}
+
+#signatures-list {
+  background-color: rgb(251, 255, 226);
+}
+
+#signatures-list .signatures-row {
+  display: flex;
+}
+
+#signatures-list .signatures-row .account {
+  width: 410px;
+}
+
+#signatures-list .signatures-row .hex {
+  width: 620px;
+}
+
+#signatures-list .signatures-row .account,
+.hex {
+  padding-right: 5px;
+}
+
+#manifestContainer {
+  background-color: rgb(228, 223, 255);
+}
+
+#manifest-data .manifest-row {
+  display: flex;
+}
+
+#manifest-data .manifest-row .filename {
+  padding-right: 10px;
 }

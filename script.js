@@ -2,7 +2,11 @@ import { base64urlStringToBase64, binToHex, getAsByteArray } from './helpers.mjs
 import { signPersonal } from './sign.mjs';
 import { key } from './key.mjs';
 import { contract1 } from './contract.mjs';
-import { getNetworkAndChainId, sendArweaveTransaction } from './utils.mjs';
+import {
+  getNetworkAndChainId,
+  sendArweaveTransaction,
+  createArweaveManest,
+} from './utils.mjs';
 
 const web3 = new Web3(Web3.givenProvider);
 
@@ -13,6 +17,8 @@ const filesMetaData = [];
 const currentFileMetaData = {};
 const signs = [];
 const hexs = [];
+
+const accounts = [];
 
 window.onload = async () => {
   const ready = document.getElementById('metamaskReady');
@@ -31,6 +37,9 @@ window.onload = async () => {
   const uploadedData = document.getElementById('uploadedData');
   const gas = document.getElementById('gas');
   const currentAccount = document.getElementById('currentAccount');
+  const sigNatureList = document.getElementById('signatures');
+  const sendManifestButton = document.getElementById('sendManifestButton');
+  console.log(sigNatureList);
 
   if (!window.ethereum) {
     console.log('MetaMask is not installed!');
@@ -43,12 +52,18 @@ window.onload = async () => {
   currentAccount.textContent = `${newAccounts}`;
 
   ethereum.on('accountsChanged', (accounts) => {
-    console.log('account change', accounts);
+    // console.log('account change', accounts);
     currentAccount.textContent = `${accounts}`;
   });
 
   const arweave = Arweave.init({});
   arweave.network.getInfo().then((data) => console.log('arweave connect status: ', data));
+
+  sendManifestButton.addEventListener('click', async () => {
+    console.log('sendManifestButton');
+    const manifest = createArweaveManest(filesMetaData);
+    console.log('manifest', JSON.stringify(manifest));
+  });
 
   bulkmintButton.addEventListener('click', async () => {
     console.log('bulk mint clicked');
@@ -88,13 +103,18 @@ window.onload = async () => {
     const hex = binToHex(decoded);
     // console.log('hex', hex);
 
+    // console.log('newAccount', newAccounts);
+    const { chainId, newAccounts, networkId } = await getNetworkAndChainId();
+
     const sign = await signPersonal(newAccounts, hex);
 
     signature.textContent = sign;
     currentFileMetaData.sign = sign;
     currentFileMetaData.hex = `0x${hex}`;
+    currentFileMetaData.account = newAccounts;
     signs.push(sign);
     hexs.push(hex);
+    accounts.push({ account: newAccounts[0], sign, hex });
 
     // const xxx = hexs.reduce((acc, val) => {
     //   return acc.length === 0 ? `0x${val}` : acc + ', ' + `0x${val}`;
@@ -114,6 +134,12 @@ window.onload = async () => {
     filesMetaData.forEach((data) => {
       dataList.appendChild(createDataListElement(data));
     });
+    sigNatureList.innerHTML = null;
+    console.log(sigNatureList);
+    console.log(accounts);
+    accounts.forEach(({ account, sign, hex }) =>
+      sigNatureList.appendChild(createSignaturesRow(account, hex, sign)),
+    );
   });
 
   form.addEventListener('submit', async (event) => {
@@ -163,7 +189,10 @@ window.onload = async () => {
     uploadedUri.appendChild(jsonLink);
     currentFileMetaData.name = imageMetaData.name;
     currentFileMetaData.description = imageMetaData.description;
+    currentFileMetaData.imageId = imageId;
     currentFileMetaData.imageURI = imageURI;
+
+    currentFileMetaData.jsonId = jsonId;
     currentFileMetaData.jsonURI = jsonURI;
     currentFileMetaData.fileName = file.name;
   });
@@ -177,6 +206,7 @@ const createDataListElement = (imageMetaData) => {
   const descriptionDiv = document.createElement('div');
   const imageUriDiv = document.createElement('div');
   const jsonUriDiv = document.createElement('div');
+  const account = document.createElement('div');
   const hex = document.createElement('div');
   const sign = document.createElement('div');
   nameDiv.innerHTML = `<div class="title-col">Name:</div> <div>${imageMetaData.name}</div>`;
@@ -189,11 +219,14 @@ const createDataListElement = (imageMetaData) => {
   imageUriDiv.classList.add('metarow');
   jsonUriDiv.innerHTML = `<div class="title-col">JSONURI:</div> <div><a href="${imageMetaData.jsonURI}" target="_blank">${imageMetaData.jsonURI}</a></div>`;
   jsonUriDiv.classList.add('metarow');
+  account.innerHTML = `<div class="title-col">Account:</div> <div>${imageMetaData.account}</div>`;
+  account.classList.add('metarow');
   hex.innerHTML = `<div class="title-col">ArweaveIDs in hex:</div> <div>${imageMetaData.hex}</div>`;
   hex.classList.add('metarow');
   sign.innerHTML = `<div class="title-col">Signature:</div> <div class="sign">${imageMetaData.sign}</div>`;
   sign.classList.add('metarow');
 
+  div1.appendChild(account);
   div1.appendChild(nameDiv);
   div1.appendChild(fileNameDiv);
   div1.appendChild(descriptionDiv);
@@ -202,4 +235,26 @@ const createDataListElement = (imageMetaData) => {
   div1.appendChild(hex);
   div1.appendChild(sign);
   return div1;
+};
+
+const createSignaturesRow = (account, hex, signature) => {
+  const container = document.createElement('div');
+  container.classList.add('signatures-row');
+
+  const accountDiv = document.createElement('div');
+  accountDiv.classList.add('account');
+  accountDiv.textContent = `${account}`;
+
+  const hexDiv = document.createElement('div');
+  hexDiv.classList.add('hex');
+  hexDiv.textContent = `${hex}`;
+
+  const signatureDiv = document.createElement('div');
+  signatureDiv.classList.add('signature');
+  signatureDiv.textContent = `${signature}`;
+
+  container.appendChild(accountDiv);
+  container.appendChild(hexDiv);
+  container.appendChild(signatureDiv);
+  return container;
 };

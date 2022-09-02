@@ -50,3 +50,18 @@ export const sendArweaveTransaction = async (
 
   return transaction.id;
 };
+
+export const createArweaveManest = (filesMetaData) => {
+  console.log('files', filesMetaData);
+  // [ 'filename': { id: 'id}]
+  const paths = filesMetaData.reduce((acc, val, index) => {
+    acc[`${index}.json`] = { id: val.jsonId };
+    return acc;
+  }, {});
+  // console.log(JSON.stringify(paths));
+  return {
+    manifest: 'arweave/paths',
+    version: '0.1.0',
+    paths,
+  };
+};
