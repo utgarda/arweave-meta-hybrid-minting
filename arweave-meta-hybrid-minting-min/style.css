@@ -1,0 +1,75 @@
+html {
+  height: 100%;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 500;
+}
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body div {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+h2,
+h4 {
+  margin: 0;
+  padding: 0;
+}
+
+body form {
+  margin-top: 10px;
+}
+
+#root {
+  background-color: blanchedalmond;
+}
+
+.metacontainer div {
+  background-color: rgb(201, 252, 235);
+  margin: 0;
+  padding: 0;
+}
+
+.metacontainer .metarow div {
+  display: inline-block;
+}
+
+.metacontainer .title-col {
+  width: 200px;
+}
+
+#signatures-list {
+  background-color: rgb(251, 255, 226);
+}
+
+#signatures-list .signatures-row {
+  display: flex;
+}
+
+#signatures-list .signatures-row .account {
+  width: 410px;
+}
+
+#signatures-list .signatures-row .hex {
+  width: 620px;
+}
+
+#signatures-list .signatures-row .account,
+.hex {
+  padding-right: 5px;
+}
+
+#manifestContainer {
+  background-color: rgb(228, 223, 255);
+}
+
+#manifest-data .manifest-row {
+  display: flex;
+}
+
+#manifest-data .manifest-row .filename {
+  padding-right: 10px;
+}
